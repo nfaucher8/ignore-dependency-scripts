@@ -36,7 +36,29 @@ const gitPath = path.resolve(rootPath, '.git');
 
 let myLibAsDep = !fs.existsSync(gitPath);
 
-const scripts = process.argv.slice(2).join(' ');
+// Ignore the first 2 args in argv because they are the path and script name
+let argCount = 2;
+for (let arg of process.argv.slice(2)) {
+  if (arg.startsWith("-")) {
+    // Add 1 for each argument found starting with "-"
+    argCount = argCount + 1;
+
+    switch(arg) {
+      case '-i': 
+        // Inverse flag, instead of running the script when it is not a dependency run it when it is a dependency
+        myLibAsDep = !myLibAsDep;
+        break;
+      default: 
+        console.log(`Unknown flag ${arg}`);
+    }
+  } else {
+    // After we find the first non "-" arg stop checking
+    break;
+  }
+}
+
+// Use the arg count from before to get only script args
+const scripts = process.argv.slice(argCount).join(' ');
 
 if (!scripts) {
   throw new Error('No script was provided.');
